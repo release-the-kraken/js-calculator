@@ -109,10 +109,11 @@ const buttons = classes("buttons");
 let resultArray =[],
     currentValue = "",
     valuesString = "",
-    currentResult = 0;
+    currentResult = 0,
+    isInputCalculated = false,
+    wasOperatorUsed = false;
 mainDisplay.innerText = currentResult;
 auxDisplay.innerText = currentResult;
-let isInputCalculated = false;
 //----------------HANDLECLICK FUNCTION---------
 const handleClick = (e) => {
   let currentInput = e.target.innerText;
@@ -120,38 +121,37 @@ const handleClick = (e) => {
         operatorPattern = "+-*/";
  
   if(currentInput.match(numPattern)){   
-     mainDisplay.style.fontSize = "2.5em";
     if(!isInputCalculated){
       if(currentInput == "." && currentValue.includes(".")){
-        currentValue = currentValue;
+        currentValue;
       }else if(currentValue.length < 12){
       currentValue += currentInput;
     }
       mainDisplay.innerHTML = currentValue;
+      if((resultArray.join('') + currentValue).length < 32){
       auxDisplay.innerText = resultArray.join('') + currentValue;
-      console.log(resultArray);
-      
+      }
+      wasOperatorUsed = false;
     }
   }
-  if(operatorPattern.includes(currentInput)){
+  if(operatorPattern.includes(currentInput) && !wasOperatorUsed){
     if(!isInputCalculated){
-        if(!currentValue.includes(".")){
-          resultArray.push(Number.parseInt(currentValue));
-        }else{
-          resultArray.push(Number.parseFloat(currentValue));
-        }      
-    }
-    resultArray.push(currentInput);
-    valuesString += currentValue;    
-    currentValue = "";
-    let lastNumberValue = resultArray[resultArray.length - 2];
-    mainDisplay.innerText = lastNumberValue;
-    auxDisplay.innerText = resultArray.join('');
-    console.log(resultArray);
-    isInputCalculated = false;
-    
+         if(!currentValue.includes(".")){
+           resultArray.push(Number.parseInt(currentValue));
+         }else{
+           resultArray.push(Number.parseFloat(currentValue));
+         }      
+      }
+      resultArray.push(currentInput);
+      valuesString += currentValue;    
+      currentValue = "";
+      let lastNumberValue = resultArray[resultArray.length - 2];
+      mainDisplay.innerText = lastNumberValue;
+      auxDisplay.innerText = resultArray.join('');
+      isInputCalculated = false;
+      wasOperatorUsed = true;
   }
-  if(currentInput === "="){
+  if(currentInput === "=" && !wasOperatorUsed){
     if(!isInputCalculated){
       if(!currentValue.includes(".")){
         resultArray.push(Number.parseInt(currentValue));
@@ -159,9 +159,8 @@ const handleClick = (e) => {
         resultArray.push(Number.parseFloat(currentValue));
       }    
       currentResult = calculateArrayOfNums(resultArray);
-      if(currentResult.toString().includes("e+")){
-        currentResult = currentResult.toFixed(4);
-        mainDisplay.style.fontSize = "1.8em";
+      if(currentResult.toString().length > 12){
+        currentResult = currentResult.toPrecision(6);
       }else{
         currentResult = currentResult.toString().slice(0, 12); 
       }
@@ -169,10 +168,9 @@ const handleClick = (e) => {
       auxDisplay.innerText = currentResult;
       }
     isInputCalculated = true;
-    console.log(resultArray);
+    wasOperatorUsed = false;
   }
   if(currentInput === "C"){
-     mainDisplay.style.fontSize = "2.5em";
     resultArray = [];
     valuesString = "";
     currentValue = "";
@@ -180,10 +178,9 @@ const handleClick = (e) => {
     mainDisplay.innerText = currentResult;
     auxDisplay.innerText = currentResult;   
     isInputCalculated = false;
-    console.log(resultArray);
+    wasOperatorUsed = false;
   }
 }
-//map method of Array must be added to arrays from getElementsByClassNAme
 Array.prototype.slice.call(buttons).forEach(button => {  
   button.addEventListener('click', handleClick);
 });
