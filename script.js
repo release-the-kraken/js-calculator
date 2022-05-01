@@ -111,7 +111,7 @@ let resultArray =[],
     valuesString = "",
     currentResult = 0,
     isInputCalculated = false,
-    wasOperatorUsed = false;
+    wasOperatorUsed = true;//prevents providing operator as first input
 mainDisplay.innerText = currentResult;
 auxDisplay.innerText = currentResult;
 //----------------HANDLECLICK FUNCTION---------
@@ -146,8 +146,13 @@ const handleClick = (e) => {
       valuesString += currentValue;    
       currentValue = "";
       let lastNumberValue = resultArray[resultArray.length - 2];
-      mainDisplay.innerText = lastNumberValue;
-      auxDisplay.innerText = resultArray.join('');
+      if(lastNumberValue.toString().length > 12){
+        lastNumberValue = lastNumberValue.toPrecision(9);
+        auxDisplay.innerText = lastNumberValue;
+      }else{
+        auxDisplay.innerText = resultArray.join('');
+      }
+      mainDisplay.innerText = lastNumberValue;      
       isInputCalculated = false;
       wasOperatorUsed = true;
   }
@@ -160,9 +165,7 @@ const handleClick = (e) => {
       }    
       currentResult = calculateArrayOfNums(resultArray);
       if(currentResult.toString().length > 12){
-        currentResult = currentResult.toPrecision(6);
-      }else{
-        currentResult = currentResult.toString().slice(0, 12); 
+        currentResult = currentResult.toPrecision(9);
       }
       mainDisplay.innerText = currentResult;
       auxDisplay.innerText = currentResult;
@@ -178,7 +181,7 @@ const handleClick = (e) => {
     mainDisplay.innerText = currentResult;
     auxDisplay.innerText = currentResult;   
     isInputCalculated = false;
-    wasOperatorUsed = false;
+    wasOperatorUsed = true;
   }
 }
 Array.prototype.slice.call(buttons).forEach(button => {  
